@@ -1,5 +1,7 @@
 package tech.cassandre.trading.bot.dto.util;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 /**
  * Gain.
  */
@@ -9,9 +11,11 @@ public class GainDTO {
     private final double percentage;
 
     /** Gain made (amount). */
+    @JsonBackReference
     private final CurrencyAmountDTO amount;
 
     /** Fees. */
+    @JsonBackReference
     private final CurrencyAmountDTO fees;
 
     /**

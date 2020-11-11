@@ -1,5 +1,7 @@
 package tech.cassandre.trading.bot.dto.position;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import tech.cassandre.trading.bot.dto.market.TickerDTO;
 import tech.cassandre.trading.bot.dto.trade.TradeDTO;
 import tech.cassandre.trading.bot.dto.util.CurrencyAmountDTO;
@@ -10,8 +12,10 @@ import tech.cassandre.trading.bot.util.exception.PositionException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,6 +24,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static java.math.RoundingMode.HALF_UP;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 import static tech.cassandre.trading.bot.dto.position.PositionStatusDTO.CLOSED;
 import static tech.cassandre.trading.bot.dto.position.PositionStatusDTO.CLOSING;
 import static tech.cassandre.trading.bot.dto.position.PositionStatusDTO.OPENED;
@@ -34,6 +40,7 @@ import static tech.cassandre.trading.bot.dto.trade.OrderTypeDTO.BID;
 public class PositionDTO {
 
     /** Position version (used for database backup). */
+    @JsonIgnore
     private final AtomicLong version = new AtomicLong(0L);
 
     /** An identifier that uniquely identifies the position. */
@@ -279,6 +286,7 @@ public class PositionDTO {
      *
      * @return gain
      */
+    @JsonBackReference
     public GainDTO getGain() {
         if (status == CLOSED) {
             // Gain calculation for currency pair : ETH-BTC
@@ -439,7 +447,8 @@ public class PositionDTO {
         return trades.values()
                 .stream()
                 .filter(t -> BID.equals(t.getType()))
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(TradeDTO::getTimestamp, nullsLast(naturalOrder())))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -451,7 +460,8 @@ public class PositionDTO {
         return trades.values()
                 .stream()
                 .filter(t -> ASK.equals(t.getType()))
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(TradeDTO::getTimestamp, nullsLast(naturalOrder())))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -496,17 +506,9 @@ public class PositionDTO {
      *
      * @return lastCalculatedGain
      */
+    @JsonIgnore
     @Deprecated(since = "2.4", forRemoval = true)
     public final Optional<GainDTO> getLastCalculatedGain() {
-        return Optional.ofNullable(latestCalculatedGain);
-    }
-
-    /**
-     * Getter latestCalculatedGain.
-     *
-     * @return latestCalculatedGain
-     */
-    public final Optional<GainDTO> getLatestCalculatedGain() {
         return Optional.ofNullable(latestCalculatedGain);
     }
 
@@ -526,6 +528,16 @@ public class PositionDTO {
      */
     public final Optional<GainDTO> getHighestCalculatedGain() {
         return calculateGainFromPrice(highestPrice);
+    }
+
+
+    /**
+     * Getter latestCalculatedGain.
+     *
+     * @return latestCalculatedGain
+     */
+    public final Optional<GainDTO> getLatestCalculatedGain() {
+        return Optional.ofNullable(latestCalculatedGain);
     }
 
     /**

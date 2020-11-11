@@ -1,5 +1,6 @@
 package tech.cassandre.trading.bot.dto.trade;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import tech.cassandre.trading.bot.dto.util.CurrencyAmountDTO;
 import tech.cassandre.trading.bot.dto.util.CurrencyDTO;
 import tech.cassandre.trading.bot.dto.util.CurrencyPairDTO;
@@ -45,6 +46,7 @@ public class TradeDTO {
     private final BigDecimal originalAmount;
 
     /** The currency-pair. */
+    @JsonBackReference
     private final CurrencyPairDTO currencyPair;
 
     /** The price. */
@@ -54,6 +56,7 @@ public class TradeDTO {
     private final ZonedDateTime timestamp;
 
     /** The fee that was charged by the exchange for this trade. */
+    @JsonBackReference
     private final CurrencyAmountDTO fee;
 
     /**

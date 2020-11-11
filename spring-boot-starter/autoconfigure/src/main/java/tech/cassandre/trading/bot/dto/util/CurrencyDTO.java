@@ -1,5 +1,7 @@
 package tech.cassandre.trading.bot.dto.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -991,6 +993,7 @@ public final class CurrencyDTO {
      *
      * @return currency
      */
+    @JsonIgnore
     public CurrencyDTO getIso4217Currency() {
         if (attributes.isoCode == null) {
             return this;
@@ -1004,6 +1007,7 @@ public final class CurrencyDTO {
      *
      * @return currency
      */
+    @JsonIgnore
     public CurrencyDTO getCommonlyUsedCurrency() {
         return getCodeCurrency(attributes.commonCode);
     }
@@ -1013,6 +1017,7 @@ public final class CurrencyDTO {
      *
      * @return currency
      */
+    @JsonIgnore
     public Set<String> getCurrencyCodes() {
         return attributes.codes;
     }
